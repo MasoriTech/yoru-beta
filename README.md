@@ -1,8 +1,12 @@
 # Yoru v0.63.0 — KoboldCpp como cérebro
 
+[![CI](https://github.com/MasoriTech/yoru-beta/actions/workflows/ci.yml/badge.svg)](https://github.com/MasoriTech/yoru-beta/actions/workflows/ci.yml)
+
 Assistente que vive na área de trabalho do Windows: avatar VRM 3D (ou chibi 2D) transparente, chat com IA, voz, gestos pela câmera, automação doméstica e controle pelo celular. O cérebro padrão é o **KoboldCpp**, então a IA roda no seu PC, sem conta e sem chave.
 
 > ⚠️ **Versão beta.** Está em teste público e pode ter bugs. Achou algo? [Abra uma issue](../../issues/new/choose). Veja [Reportar problemas](#reportar-problemas).
+
+> 📥 **Só quer usar?** Baixe o instalador na página de [Releases](../../releases/latest). Quem vai mexer no código segue em [Desenvolvimento](#desenvolvimento).
 
 ## O que tem
 
@@ -79,4 +83,4 @@ Use os formulários em **Issues**. Inclua versão, Windows, provedor de IA e pas
 
 ## Licença
 
-Todos os direitos reservados (`UNLICENSED`). Veja `build/license.txt`. Os modelos em `assets/` podem ter licenças próprias.
+Todos os direitos reservados (`UNLICENSED`). Veja `build/license.txt`. Os avatares em `assets/` são criações do autor, feitas no VRoid Studio, e não podem ser reutilizados sem permissão.

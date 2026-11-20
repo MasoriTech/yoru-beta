@@ -4,13 +4,21 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
     runs-on: windows-latest
+    timeout-minutes: 20
     env:
       ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
     steps:
+      # Sempre LF no runner (os testes de CSP dependem dos bytes exatos).
+      - run: git config --global core.autocrlf false
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
@@ -18,3 +26,7 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: npm test
+      - name: Mostrar testes que falharam
+        if: failure()
+        shell: bash
+        run: node --test test/*.test.js 2>&1 | grep -E "^not ok" || true

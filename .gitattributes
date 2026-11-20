@@ -1,7 +1,7 @@
-* text=auto
+# Força LF em todo texto, mesmo no Windows (os testes de CSP dependem dos bytes exatos).
+* text=auto eol=lf
 *.bat text eol=crlf
 *.ps1 text eol=crlf
-*.sh text eol=lf
 *.vrm binary
 *.glb binary
 *.webp binary

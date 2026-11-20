@@ -2,16 +2,21 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
+const { pathToFileURL } = require('node:url');
 const { createIpcSecurity } = require('../src/ipc-security');
 
-function setup(url = 'file:///app/src/panel.html') {
+// Caminhos montados com path/pathToFileURL para valer igual no Windows (C:\\...) e no Linux.
+const APP_DIR = path.resolve('/app/src');
+const PANEL_URL = pathToFileURL(path.join(APP_DIR, 'panel.html')).href;
+
+function setup(url = PANEL_URL) {
   const handlers = {}, events = {};
   const wc = { id: 1, isDestroyed: () => false, getURL: () => url, mainFrame: { url } };
   const win = { isDestroyed: () => false, webContents: wc };
   const BrowserWindow = { fromWebContents: (x) => x === wc ? win : null, getAllWindows: () => [win] };
   const ipcMain = { handle: (n, f) => { handlers[n] = f; }, on: (n, f) => { events[n] = f; } };
   let now = 1000;
-  const secure = createIpcSecurity({ ipcMain, BrowserWindow, appDir: '/app/src', now: () => now, limits: { ping: { count: 2, windowMs: 1000 } } });
+  const secure = createIpcSecurity({ ipcMain, BrowserWindow, appDir: APP_DIR, now: () => now, limits: { ping: { count: 2, windowMs: 1000 } } });
   return { secure, handlers, events, wc, win, setNow: (n) => { now = n; } };
 }
 
@@ -37,10 +42,10 @@ test('IPC limita rajadas e libera após a janela de tempo', async () => {
 test('IPC limita execuções MASORI e leitura excessiva do workspace', async () => {
   const limits = { 'masori-run': { count: 1, windowMs: 1000 }, 'masori-workspace-read': { count: 2, windowMs: 1000 } };
   const handlers = {};
-  const wc = { id: 9, isDestroyed: () => false, getURL: () => 'file:///app/src/panel.html', mainFrame: { url: 'file:///app/src/panel.html' } };
+  const wc = { id: 9, isDestroyed: () => false, getURL: () => PANEL_URL, mainFrame: { url: PANEL_URL } };
   const win = { isDestroyed: () => false, webContents: wc };
   const BrowserWindow = { fromWebContents: (x) => x === wc ? win : null, getAllWindows: () => [win] };
-  const secure = createIpcSecurity({ ipcMain: { handle: (name, fn) => { handlers[name] = fn; }, on: () => {} }, BrowserWindow, appDir: '/app/src', limits });
+  const secure = createIpcSecurity({ ipcMain: { handle: (name, fn) => { handlers[name] = fn; }, on: () => {} }, BrowserWindow, appDir: APP_DIR, limits });
   secure.handle('masori-run', () => true); secure.handle('masori-workspace-read', () => true);
   const event = { sender: wc, senderFrame: wc.mainFrame };
   assert.equal(await handlers['masori-run'](event), true);

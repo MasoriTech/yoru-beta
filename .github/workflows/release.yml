@@ -1,6 +1,6 @@
 name: Release
 
-# Ao publicar uma tag (ex.: v0.63.0-beta.1), gera o instalador e cria a release.
+# Ao publicar uma tag (ex.: v0.63.0-beta.1), testa, gera o instalador e cria a release.
 # Tags com hífen (-beta, -rc) saem marcadas como pré-lançamento.
 on:
   push:
@@ -12,18 +12,33 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
+    timeout-minutes: 45
     steps:
+      - run: git config --global core.autocrlf false
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+      - name: Conferir tag x versão do package.json
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          case "$GITHUB_REF_NAME" in
+            "v$VERSION"|"v$VERSION-"*) echo "Tag $GITHUB_REF_NAME combina com a versão $VERSION" ;;
+            *) echo "::error::A tag $GITHUB_REF_NAME não combina com a versão $VERSION do package.json (use v$VERSION ou v$VERSION-beta.1)"; exit 1 ;;
+          esac
       - run: npm ci --no-audit --no-fund
       - run: npm test
       - run: npx electron-builder --win --publish never
+      - name: Conferir que os instaladores foram gerados
+        shell: bash
+        run: |
+          ls -la dist/*.exe
+          test -n "$(ls dist/*.exe 2>/dev/null)"
       - uses: softprops/action-gh-release@v2
         with:
-          files: |
-            dist/*.exe
+          files: dist/*.exe
+          fail_on_unmatched_files: true
           prerelease: ${{ contains(github.ref_name, '-') }}
           generate_release_notes: true
