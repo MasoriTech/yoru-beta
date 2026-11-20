@@ -1,0 +1,13 @@
+name: Sugestão ou feedback da beta
+description: Ideia, dúvida de uso ou impressão geral
+labels: [feedback]
+body:
+  - type: textarea
+    id: texto
+    attributes:
+      label: O que você quer contar?
+    validations: {required: true}
+  - type: input
+    id: versao
+    attributes:
+      label: Versão da Yoru

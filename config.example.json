@@ -1,0 +1,36 @@
+{
+  "provider": "kobold",
+  "kobold": {
+    "url": "http://localhost:5001/v1",
+    "apiKey": "",
+    "model": "koboldcpp"
+  },
+  "anthropic": {
+    "apiKey": "COLE_SUA_CHAVE_AQUI",
+    "model": "claude-sonnet-5-5"
+  },
+  "ollama": {
+    "url": "http://localhost:11434",
+    "model": "llama3.1"
+  },
+  "systemPrompt": "Você é a assistente que vive na área de trabalho do usuário. Responda em português, de forma curta (no máximo 2 frases), simpática e natural.",
+  "cloudflare": {
+    "accountId": "",
+    "apiToken": ""
+  },
+  "openrouter": {
+    "apiKey": "",
+    "model": "openrouter/auto"
+  },
+  "groq": {
+    "apiKey": ""
+  },
+  "gemini": {
+    "apiKey": ""
+  },
+  "openclaw": {
+    "url": "http://127.0.0.1:18789/v1",
+    "apiKey": "",
+    "model": "openclaw/default"
+  }
+}

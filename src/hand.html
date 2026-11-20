@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" />
+<title>Mão livre</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: transparent; }
+  svg { position: fixed; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  #hand { filter: drop-shadow(0 10px 8px rgba(0, 0, 0, .32)); }
+</style>
+</head>
+<body>
+<svg id="svg" xmlns="http://www.w3.org/2000/svg"><g id="hand"></g></svg>
+<script src="./hand-logic.js"></script>
+<script src="./hand.js"></script>
+</body>
+</html>

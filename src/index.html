@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-f/L57Xkjji+ohbgBWRDnCGbZOFJUNaQrE0zGIom7tLw=' 'sha256-kiR5m9JsRwv41c8lA+Zl66wpddiQzI3jEQ75qbP4CJc=' 'sha256-8TqT7wWJT68Gjj3+0X5EiXo7s4zBlMtJT03MVVBJY7g=' 'sha256-tVewP3tKXi7Wq3EwKy779jDX8boePLn+xYQtKu6+g2s='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: file:; media-src 'self' blob: data: file:; connect-src 'self' file: blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'" />
+  <title>Avatar</title>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: transparent; font-family: "Segoe UI", sans-serif; }
+    #a2d { position: fixed; inset: 0; pointer-events: none; opacity: 0; transition: opacity .45s ease; }
+    #a2d img { position: absolute; transform-origin: 50% 100%; user-select: none; -webkit-user-drag: none; will-change: transform, filter; filter: none; transition: filter .32s ease; z-index: 2; }
+    #a2d .a2d-fx { position:absolute; pointer-events:none; z-index:1; opacity:0; transition:opacity .5s ease; }
+    #a2d .a2d-fx.active { opacity:1; }
+    #a2d .a2d-aura { position:absolute; inset:12% 8% 2%; border-radius:48% 48% 35% 35%; background:radial-gradient(ellipse at 50% 65%, rgba(255,132,35,.15), rgba(255,132,35,0) 68%); filter:blur(12px); opacity:var(--yoru-aura-opacity,.62); transform:scale(calc(1 + var(--yoru-mouth,0) * .055)); animation:yoruAura 4.5s ease-in-out infinite; transition:opacity .28s ease, transform .12s ease; }
+    #a2d .a2d-spark { position:absolute; width:5px; height:5px; border-radius:50%; background:#ffd36a; box-shadow:0 0 10px 3px rgba(255,150,48,.55); opacity:0; animation:yoruSpark 4.8s ease-in-out infinite; }
+    #a2d .a2d-spark.s1 { left:13%; top:32%; animation-delay:.2s; }
+    #a2d .a2d-spark.s2 { right:12%; top:23%; width:4px; height:4px; animation-delay:1.8s; }
+    #a2d .a2d-spark.s3 { right:20%; bottom:22%; width:3px; height:3px; animation-delay:3.1s; }
+    #a2d[data-emotion=happy] .a2d-aura, #a2d[data-emotion=excited] .a2d-aura { background:radial-gradient(ellipse at 50% 65%, rgba(255,170,60,.24), transparent 70%); }
+    #a2d[data-emotion=sad] .a2d-aura { background:radial-gradient(ellipse at 50% 65%, rgba(90,155,255,.17), transparent 70%); }
+    #a2d[data-emotion=angry] .a2d-aura { background:radial-gradient(ellipse at 50% 65%, rgba(255,75,55,.2), transparent 70%); }
+    #a2d[data-speaking=true] .a2d-spark { animation-duration:1.8s; }
+    #a2d[data-speaking=true] .a2d-aura { animation-duration:2.2s; }
+    @keyframes yoruAura { 0%,100% { transform:scale(.96); opacity:.55; } 50% { transform:scale(1.05); opacity:1; } }
+    @keyframes yoruSpark { 0%,70%,100% { opacity:0; transform:translateY(8px) scale(.5); } 78% { opacity:.95; transform:translateY(-3px) scale(1.15); } 88% { opacity:.3; transform:translateY(-12px) scale(.7); } }
+    canvas { position: fixed; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity .45s ease; }
+    #bubble {
+      position: fixed; left: 16px; right: 16px; top: 12px; display: none;
+      background: rgba(255,255,255,.95); color: #222; padding: 10px 14px;
+      border-radius: 14px; font-size: 14px; line-height: 1.4; box-shadow: 0 2px 10px rgba(0,0,0,.25);
+    }
+    #bubble.err { color: #b00020; }
+    #bubble.b-dark { background: rgba(24,25,32,.95); color: #f1f2f6; box-shadow: 0 2px 10px rgba(0,0,0,.5); }
+    #bubble.b-dark.err { color: #ff8a90; }
+    #bubble.b-accent { background: var(--b-accent); color: var(--b-on); }
+    #bubble.b-accent.err { color: var(--b-on); text-decoration: underline wavy; }
+    #chat.b-dark input { background: rgba(24,25,32,.95); color: #f1f2f6; }
+    #chat.b-accent input { background: var(--b-accent); color: var(--b-on); }
+    #chat.b-accent input::placeholder { color: var(--b-on); opacity: .7; }
+    #orb { position: fixed; left: calc(100% - 26px); top: calc(100% - 26px); width: 14px; height: 14px; border-radius: 50%; display: none; z-index: 5;
+      pointer-events: none; background: #3ddc84; box-shadow: 0 0 8px 2px rgba(61,220,132,.55); transition: transform .12s ease, background .2s, box-shadow .2s; }
+    #orb.on { display: block; animation: orbPulse 2.4s ease-in-out infinite; }
+    #orb.hearing { transform: scale(1.5); background: #7dffb0; box-shadow: 0 0 14px 5px rgba(125,255,176,.85); animation: none; }
+    #orb.busy { background: #7aa2ff; box-shadow: 0 0 8px 2px rgba(122,162,255,.6); animation: orbSpin .9s ease-in-out infinite; }
+    #orb.muted { background: #8a8d99; box-shadow: none; animation: none; opacity: .55; }
+    @keyframes orbPulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+    @keyframes orbSpin { 0%, 100% { transform: scale(.8); } 50% { transform: scale(1.2); } }
+    #chat { position: fixed; left: 16px; right: 16px; bottom: 12px; display: none; }
+    #chat input {
+      width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 20px;
+      border: none; outline: none; font-size: 14px; background: rgba(255,255,255,.95);
+      box-shadow: 0 2px 10px rgba(0,0,0,.25);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div id="a2d"><img id="a2dImg" alt="" draggable="false" /></div>
+  <div id="bubble"></div>
+  <div id="orb" title="Ouvindo"></div>
+  <div id="chat"><input id="input" placeholder="Fale com ela e aperte Enter..." autocomplete="off" /></div>
+
+  <script>
+    function showErr(msg) {
+      const b = document.getElementById('bubble');
+      b.style.display = 'block';
+      b.classList.add('err');
+      b.textContent = 'Erro: ' + msg;
+    }
+    window.addEventListener('error', (e) => showErr(e.message));
+    window.addEventListener('unhandledrejection', (e) => showErr(String(e.reason)));
+  </script>
+  <script>
+    // Caminho principal: ./vendor (copiado pelo scripts/vendor.js, entra no instalador).
+    // Backup: ../node_modules (funciona no "npm start"). Se o principal faltar, usa o backup automaticamente.
+    (function () {
+      const SOURCES = [
+        { name: 'vendor', three: './vendor/three/three.module.js', addons: './vendor/three/addons/', vrm: './vendor/three-vrm/three-vrm.module.js', probe: './vendor/three/addons/loaders/GLTFLoader.js' },
+        { name: 'node_modules', three: '../node_modules/three/build/three.module.js', addons: '../node_modules/three/examples/jsm/', vrm: '../node_modules/@pixiv/three-vrm/lib/three-vrm.module.js', probe: '../node_modules/three/examples/jsm/loaders/GLTFLoader.js' },
+      ];
+      function exists(url) {
+        try {
+          const x = new XMLHttpRequest();
+          x.open('GET', url, false);
+          x.send();
+          return x.status === 200 || (x.status === 0 && x.responseText.length > 0);
+        } catch (_) { return false; }
+      }
+      let chosen = SOURCES.find((src) => exists(src.probe));
+      if (!chosen) {
+        chosen = SOURCES[0]; // nenhum achado: segue com o principal e mostra o erro real do carregamento
+        showErr('não encontrei os arquivos do three.js (src/vendor nem node_modules). Rode "npm install" e tente de novo.');
+      } else if (chosen !== SOURCES[0]) {
+        console.log('[vendor] caminho principal indisponível, usando o backup: ' + chosen.name);
+      }
+      const map = document.createElement('script');
+      map.type = 'importmap';
+      map.textContent = JSON.stringify({ imports: { 'three': chosen.three, 'three/addons/': chosen.addons, '@pixiv/three-vrm': chosen.vrm } });
+      document.currentScript.after(map);
+    })();
+  </script>
+  <script src="./speech.js"></script>
+  <script type="module" src="./renderer.js"></script>
+</body>
+</html>

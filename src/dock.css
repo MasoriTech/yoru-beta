@@ -1,0 +1,111 @@
+/* Float Dock — acabamento do avatar na barra + modo exclusivo (janela transparente justa ao conteúdo).
+   Carregado depois do <style> do panel.html para vencer as regras antigas do dock. */
+
+/* ---------- chip do avatar (substitui o botão com emoji 🙈/👁) ---------- */
+#vis .chip-face, #vis .chip-dot { display:none; }
+body[data-layout="floatdock"] #vis {
+  position:relative; display:block; width:46px; height:46px; min-height:46px; flex:0 0 46px; padding:0; overflow:visible;
+  border:1px solid color-mix(in srgb,var(--ok) 55%,var(--line)); border-radius:16px; font-size:0; color:transparent;
+  background:linear-gradient(150deg,color-mix(in srgb,var(--accent) 22%,var(--card)),color-mix(in srgb,var(--bg) 92%,#000));
+  box-shadow:0 5px 14px #0006, 0 0 0 2px color-mix(in srgb,var(--ok) 16%,transparent), inset 0 1px 0 #ffffff1c;
+  transition:transform .22s cubic-bezier(.2,.8,.2,1), border-color .2s, box-shadow .2s;
+}
+body[data-layout="floatdock"] #vis::before { content:none; }
+body[data-layout="floatdock"] #vis .chip-label { display:none; }
+body[data-layout="floatdock"] #vis .chip-face {
+  display:block; position:absolute; inset:2px; width:calc(100% - 4px); height:calc(100% - 4px);
+  object-fit:cover; object-position:50% 22%; border-radius:13px; pointer-events:none; user-select:none;
+  transition:filter .25s, opacity .25s, transform .25s;
+}
+body[data-layout="floatdock"] #vis .chip-dot {
+  display:block; position:absolute; right:-3px; bottom:-3px; width:13px; height:13px; border-radius:50%;
+  border:2.5px solid var(--side); background:var(--ok); box-shadow:0 0 9px color-mix(in srgb,var(--ok) 70%,transparent);
+  transition:background .2s, box-shadow .2s;
+}
+body[data-layout="floatdock"] #vis:hover { transform:translateY(-4px) scale(1.06); border-color:var(--ok); }
+body[data-layout="floatdock"] #vis:hover .chip-face { transform:scale(1.05); }
+body[data-layout="floatdock"] #vis:active { transform:scale(.95); }
+body[data-layout="floatdock"] #vis.off { border-color:var(--line); box-shadow:0 4px 10px #0005, inset 0 1px 0 #ffffff10; }
+body[data-layout="floatdock"] #vis.off .chip-face { filter:grayscale(.85) brightness(.7); opacity:.8; }
+body[data-layout="floatdock"] #vis.off .chip-dot { background:var(--off); box-shadow:none; }
+
+/* ---------- ajustes finos do dock (todas as bordas) ---------- */
+body[data-layout="floatdock"] .brand-mark { letter-spacing:-.5px; }
+body[data-layout="floatdock"] .tab:hover + .tab,
+body[data-layout="floatdock"] .tab:has(+ .tab:hover) { transform:translateY(-2px) scale(1.02); }
+body[data-layout="floatdock"][data-dock-position="left"] .tab:hover,
+body[data-layout="floatdock"][data-dock-position="right"] .tab:hover { transform:scale(1.07); }
+body[data-layout="floatdock"][data-dock-position="left"] .tab:hover + .tab,
+body[data-layout="floatdock"][data-dock-position="left"] .tab:has(+ .tab:hover),
+body[data-layout="floatdock"][data-dock-position="right"] .tab:hover + .tab,
+body[data-layout="floatdock"][data-dock-position="right"] .tab:has(+ .tab:hover) { transform:scale(1.025); }
+body[data-layout="floatdock"][data-dock-position="top"] .tab:hover { transform:translateY(5px) scale(1.055); }
+body[data-layout="floatdock"] .tab:active { transform:scale(.93); }
+
+/* ---------- modo exclusivo: a janela é só o dock ---------- */
+html.dock-only, html.dock-only body { background:transparent !important; overflow:hidden !important; width:100%; height:100%; margin:0; }
+html.dock-only .titlebar { display:none !important; }
+body.dock-only { --dp:26px; --tbh:0px; }
+body.dock-only .app { display:block; height:100vh !important; min-height:0 !important; }
+body.dock-only .content, body.dock-only .server-rail, body.dock-only .side-foot { display:none !important; }
+
+body.dock-only[data-layout="floatdock"] .side {
+  z-index:9999; position:fixed; max-width:calc(100vw - 2*var(--dp)); max-height:calc(100vh - 2*var(--dp));
+  padding:9px 10px; gap:9px; border-radius:22px;
+  box-shadow:0 8px 22px #000a, 0 0 20px color-mix(in srgb,var(--accent) 20%,transparent), inset 0 1px 0 #ffffff1f, inset 0 -1px 0 #0008;
+  transition:opacity .16s ease; translate:0 0;
+  animation:dock-in .38s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes dock-in { from { opacity:0; translate:0 14px; } to { opacity:1; translate:0 0; } }
+body.dock-only[data-layout="floatdock"][data-dock-position="top"] .side { animation-name:dock-in-top; }
+@keyframes dock-in-top { from { opacity:0; translate:0 -14px; } to { opacity:1; translate:0 0; } }
+
+/* ancoragem pelas bordas da janela: vale tanto na janela justa quanto na que cobre a tela durante o arraste */
+body.dock-only[data-layout="floatdock"][data-dock-position="bottom"] .side { left:50%; right:auto; top:auto; bottom:var(--dp); transform:translateX(-50%); }
+body.dock-only[data-layout="floatdock"][data-dock-position="top"] .side { left:50%; right:auto; top:var(--dp); bottom:auto; transform:translateX(-50%); }
+body.dock-only[data-layout="floatdock"][data-dock-position="left"] .side { left:var(--dp); right:auto; top:50%; bottom:auto; transform:translateY(-50%); width:66px; padding:10px 8px; }
+body.dock-only[data-layout="floatdock"][data-dock-position="right"] .side { right:var(--dp); left:auto; top:50%; bottom:auto; transform:translateY(-50%); width:66px; padding:10px 8px; }
+
+body.dock-only[data-layout="floatdock"] .tabs { max-width:none; max-height:none; min-width:0; min-height:0; }
+
+/* a janela do dock é estreita: as regras responsivas do painel (≤760px/≤640px) não valem aqui — tamanhos fixos */
+body.dock-only[data-layout="floatdock"] .brand,
+body.dock-only[data-layout="floatdock"] #vis { width:46px; height:46px; min-height:46px; flex:0 0 46px; }
+body.dock-only[data-layout="floatdock"] .tab { width:44px; height:44px; min-height:44px; flex:0 0 44px; }
+body.dock-only[data-layout="floatdock"] .side { border-radius:22px; }
+body.dock-only[data-layout="floatdock"][data-dock-position="left"] .nav-group,
+body.dock-only[data-layout="floatdock"][data-dock-position="right"] .nav-group { padding-bottom:8px; }
+
+/* recolher: a alça pendura para fora da barra; recolhido, o dock vira um botão só */
+body.dock-only .dock-collapse { display:grid !important; }
+body.dock-only[data-layout="floatdock"][data-dock-collapsed="true"] .side { width:56px !important; height:56px !important; min-height:56px !important; max-height:56px !important; padding:6px; }
+body.dock-only[data-layout="floatdock"][data-dock-collapsed="true"][data-dock-position="bottom"] .side { transform:translateX(-50%); }
+
+/* a área de encaixe aparece nas bordas da tela durante o arraste (janela cobre a área útil) */
+body.dock-only .dock-drop-hint { z-index:9998; }
+body.dock-only[data-dock-target="bottom"] .dock-drop-hint { bottom:10px; }
+body.dock-only[data-dock-target="top"] .dock-drop-hint { top:10px; }
+
+/* ---------- dica flutuante (substitui a dica nativa, que ficava cortada) ---------- */
+.dock-tip {
+  position:fixed; z-index:10000; left:0; top:0; display:none; max-width:210px; padding:6px 11px; pointer-events:none;
+  border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line)); border-radius:10px; white-space:nowrap;
+  background:color-mix(in srgb,var(--side) 96%,#000); color:var(--text); font:600 12px/1.25 "Segoe UI",system-ui,sans-serif;
+  box-shadow:0 6px 18px #000a, 0 0 14px color-mix(in srgb,var(--accent) 14%,transparent);
+  opacity:0; transition:opacity .12s ease;
+}
+.dock-tip.show { opacity:1; }
+.dock-tip small { display:block; margin-top:2px; color:var(--muted); font-weight:500; font-size:10.5px; }
+body[data-dock-dragging="true"] .dock-tip { display:none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  body.dock-only[data-layout="floatdock"] .side { animation:none; }
+  .dock-tip { transition:none; }
+}
+
+/* sem a máscara de esmaecer nas pontas quando tudo cabe (ela apagava um pedaço do primeiro/último ícone) */
+body.dock-only[data-layout="floatdock"] .tabs:not(.is-scrolling) { -webkit-mask-image:none; mask-image:none; }
+
+/* laterais: vence a regra antiga de max-height (100vh - 190px) que cortava o último ícone */
+body.dock-only[data-layout="floatdock"][data-dock-position="left"] .tabs,
+body.dock-only[data-layout="floatdock"][data-dock-position="right"] .tabs { max-height:none !important; }

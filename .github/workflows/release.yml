@@ -1,0 +1,29 @@
+name: Release
+
+# Ao publicar uma tag (ex.: v0.63.0-beta.1), gera o instalador e cria a release.
+# Tags com hífen (-beta, -rc) saem marcadas como pré-lançamento.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm test
+      - run: npx electron-builder --win --publish never
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.exe
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          generate_release_notes: true

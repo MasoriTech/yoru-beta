@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'">
+<title>Yoru · Dispositivos Bluetooth</title>
+<style>
+:root{color-scheme:dark;--bg:#070913;--panel:#0d1324;--line:#28345a;--muted:#a8b1cb;--text:#f4f6ff;--blue:#4b8cff;--violet:#9b5cff;--cyan:#37d7ff;--green:#45e0a2;--red:#ff708a}
+*{box-sizing:border-box}html,body{margin:0;height:100%;font:14px/1.45 "Segoe UI",system-ui,sans-serif;background:radial-gradient(ellipse at 50% -10%,#18265a 0,transparent 55%),var(--bg);color:var(--text)}
+body{padding:18px;overflow:hidden}.shell{max-width:760px;height:100%;margin:0 auto;display:flex;flex-direction:column;min-height:0}.top{display:flex;align-items:center;gap:14px;padding-bottom:18px;border-bottom:1px solid var(--line)}.brand{width:48px;height:48px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(135deg,#245be8,#9a38f8);box-shadow:0 0 28px #6d4dff70;font-size:25px}.eyebrow{font-size:11px;letter-spacing:.16em;color:#9b9eff;font-weight:700}.top h1{font-size:21px;margin:2px 0}.top p{margin:0;color:var(--muted);font-size:12px}.badge{margin-left:auto;border:1px solid #285c72;background:#0d2833;color:#79eaff;border-radius:99px;padding:6px 10px;font-size:11px;white-space:nowrap}
+main{flex:1;min-height:0;display:flex;flex-direction:column;padding:16px 0 0}.scroll{flex:1;min-height:0;overflow-y:auto;padding:2px 4px 2px 0}.intro{flex:none;display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:14px}.intro h2{margin:0;font-size:18px}.intro p{margin:5px 0 0;color:var(--muted)}.count{font-size:13px;color:#b8a2ff}.list{display:grid;gap:9px}.device{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(110deg,#111a31e8,#0a1020ee);box-shadow:0 8px 24px #0003}.device.selected{border-color:#a16cff;box-shadow:0 0 0 1px #a16cff55,0 0 28px #8651ff30}.number{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#182754;color:#c3c8ff;font-size:17px;font-weight:800}.name{font-size:14px;font-weight:700;overflow-wrap:anywhere}.meta{font-size:11px;color:var(--muted);margin-top:3px}.tag{display:inline-block;margin-top:4px;padding:2px 7px;border-radius:99px;border:1px solid #394a73;color:#b9c9ff;font-size:10px}.btn{border:1px solid #5366a6;background:#15234a;color:#fff;border-radius:10px;padding:9px 12px;font-weight:700;cursor:pointer}.btn.primary{border-color:#915cff;background:linear-gradient(110deg,#4f35c9,#762dd1);box-shadow:0 0 16px #743eff50}.btn.secondary{background:#121a2d;border-color:#39445c}.btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}.actions{display:flex;gap:9px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}.empty{border:1px dashed #475578;border-radius:16px;padding:28px;text-align:center;color:var(--muted)}.selected-card{border:1px solid #8c63ff;background:linear-gradient(140deg,#1c1740,#0e1630);border-radius:17px;padding:20px;margin:12px 0}.selected-title{font-size:19px;font-weight:800;margin:0 0 5px}.note{color:var(--muted);font-size:12px}.status{flex:none;padding:12px 14px;border-radius:12px;background:#111a2d;border:1px solid var(--line);color:#cbd6ff;margin-top:14px;min-height:44px}.status.success{border-color:#247f62;color:#8bf0c5;background:#0c241f}.status.error{border-color:#82405a;color:#ffb0bf;background:#29121e}.hint{flex:none;display:flex;align-items:center;gap:9px;color:var(--muted);font-size:12px;margin-top:18px}.mic{color:#9d7cff;font-size:17px}.footer{flex:none;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);margin-top:18px;padding-top:13px;color:#7886a6;font-size:11px}@media(max-width:520px){body{padding:12px}.device{grid-template-columns:36px 1fr}.number{width:34px;height:34px}.device .btn{grid-column:2;justify-self:start}.badge{display:none}.actions .btn{flex:1}}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:#28345a;border-radius:8px}.footer .btn{padding:7px 11px}.rescan{margin-right:auto}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="top"><div class="brand">ᛟ</div><div><div class="eyebrow">MASORI · YORU</div><h1>Dispositivos Bluetooth</h1><p>Escolha por voz ou selecione na lista.</p></div><div class="badge">● BLUETOOTH</div></header>
+  <main>
+    <div class="intro"><div><h2 id="heading">Procurando dispositivos…</h2><p id="subheading">Combinando dispositivos do Windows e anúncios próximos.</p></div><div class="count" id="count"></div></div>
+    <div class="scroll">
+    <section id="list" class="list" aria-live="polite"></section>
+    <section id="confirm" hidden>
+      <div class="selected-card"><div class="eyebrow">DISPOSITIVO SELECIONADO</div><p class="selected-title" id="selectedName"></p><div class="note" id="selectedMeta"></div></div>
+      <p id="confirmText">Deseja iniciar a conexão com este dispositivo?</p>
+      <div class="actions"><button class="btn secondary" id="cancelConfirm">Cancelar</button><button class="btn primary" id="confirmConnect">Sim, conectar</button></div>
+    </section>
+    </div>
+    <div id="status" class="status">Aguardando a busca do Yoru.</div>
+    <div class="hint"><span class="mic">◉</span><span>Comando de voz: diga <b>“o 2”</b>, depois <b>“sim”</b> para confirmar.</span></div>
+  </main>
+  <footer class="footer"><button class="btn secondary rescan" id="rescan" type="button">↻ Buscar novamente</button><button class="btn secondary" id="close" type="button">Fechar janela</button></footer>
+</div>
+<script src="bluetooth-picker.js"></script>
+</body>
+</html>

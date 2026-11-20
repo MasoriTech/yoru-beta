@@ -1,0 +1,104 @@
+{
+  "name": "yoru",
+  "productName": "Yoru",
+  "version": "0.63.0",
+  "description": "Yoru — assistente desktop com diagnóstico, recuperação segura e telemetria local",
+  "author": "Yoru",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "src/main.js",
+  "scripts": {
+    "postinstall": "node scripts/vendor.js",
+    "vendor": "node scripts/vendor.js",
+    "start": "electron .",
+    "check": "node scripts/check-voice.js",
+    "check:kobold": "node scripts/check-kobold.js",
+    "setup:openclaw": "node scripts/setup-openclaw.js",
+    "csp": "node scripts/csp-hashes.js --write",
+    "test": "node --test test/*.test.js",
+    "pack": "node scripts/vendor.js && electron-builder --win --dir",
+    "dist": "npm test && node scripts/vendor.js && electron-builder --win",
+    "dist:setup": "npm test && node scripts/vendor.js && electron-builder --win nsis",
+    "dist:portable": "npm test && node scripts/vendor.js && electron-builder --win portable",
+    "hub-agent": "node scripts/yoru-hub-agent.js",
+    "hub-agent:install": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/service/install-hub-agent.ps1",
+    "hub-agent:remove": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/service/remove-hub-agent.ps1"
+  },
+  "dependencies": {
+    "@pixiv/three-vrm": "^3.5.5",
+    "three": "^0.187.0",
+    "msedge-tts": "^2.1.1",
+    "@huggingface/transformers": "^3.7.0",
+    "@mediapipe/tasks-vision": "^0.10.0",
+    "@whiskeysockets/baileys": "^6.7.19"
+  },
+  "devDependencies": {
+    "electron": "^45.2.0",
+    "electron-builder": "^26.0.12",
+    "jsdom": "^26.1.0"
+  },
+  "build": {
+    "appId": "com.yoru.app",
+    "productName": "Yoru",
+    "copyright": "Copyright © 2026 Yoru",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "scripts/**/*",
+      "config.example.json",
+      "package.json",
+      "!**/node_modules/onnxruntime-node/bin/napi-v3/darwin/**",
+      "!**/node_modules/onnxruntime-node/bin/napi-v3/linux/**",
+      "!**/node_modules/onnxruntime-node/bin/napi-v3/win32/arm64/**",
+      "!**/node_modules/**/*.map"
+    ],
+    "asar": false,
+    "npmRebuild": false,
+    "artifactName": "Yoru-${version}-${os}-${arch}.${ext}",
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Yoru",
+      "language": "1046",
+      "deleteAppDataOnUninstall": false,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "artifactName": "Yoru-Setup-${version}.${ext}",
+      "license": "build/license.txt",
+      "installerSidebar": "build/installerSidebar.bmp",
+      "uninstallerSidebar": "build/uninstallerSidebar.bmp",
+      "installerHeader": "build/installerHeader.bmp",
+      "runAfterFinish": true
+    },
+    "portable": {
+      "artifactName": "Yoru-Portatil-${version}.${ext}"
+    }
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

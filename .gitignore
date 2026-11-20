@@ -1,0 +1,22 @@
+# dependências e build
+node_modules/
+dist/
+# gerado por "npm run vendor" (postinstall)
+src/vendor/
+
+# dados e segredos locais (NUNCA commitar)
+config.json
+.env
+.env.*
+.userdata/
+remote.json
+*.yorubackup
+*.log
+logs/
+
+# temporários e do sistema
+*.tmp
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,47 @@
+name: Bug
+description: Algo não funciona como deveria
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por testar a beta! **Nunca cole chaves de API, tokens ou senhas.** Se anexar logs, revise antes (podem ter caminhos locais).
+  - type: input
+    id: versao
+    attributes:
+      label: Versão da Yoru
+      placeholder: "0.63.0 (Central de Saúde ou package.json)"
+    validations: {required: true}
+  - type: input
+    id: windows
+    attributes:
+      label: Versão do Windows
+      placeholder: "Windows 11 23H2"
+    validations: {required: true}
+  - type: dropdown
+    id: instalacao
+    attributes:
+      label: Como você abriu a Yoru
+      options: [iniciar.bat, npm start, Instalador (Setup), Portátil]
+    validations: {required: true}
+  - type: dropdown
+    id: provedor
+    attributes:
+      label: Provedor de IA em uso
+      options: [KoboldCpp, Ollama, Anthropic, OpenRouter, Servidor local, OpenClaw, Não sei]
+  - type: textarea
+    id: passos
+    attributes:
+      label: Passos para repetir
+      placeholder: "1. Abri a aba ... 2. Cliquei em ... 3. Aconteceu ..."
+    validations: {required: true}
+  - type: textarea
+    id: esperado
+    attributes:
+      label: O que você esperava e o que aconteceu
+    validations: {required: true}
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs ou capturas de tela (opcional)
+      render: text

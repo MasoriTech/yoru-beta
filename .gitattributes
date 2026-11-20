@@ -1,2 +1,10 @@
-# Auto detect text files and perform LF normalization
 * text=auto
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+*.sh text eol=lf
+*.vrm binary
+*.glb binary
+*.webp binary
+*.png binary
+*.ico binary
+*.bmp binary

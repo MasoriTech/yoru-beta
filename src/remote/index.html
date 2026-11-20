@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#140f1c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Yoru" />
+  <title>Yoru</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/icon-192.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body>
+  <main id="app">
+    <section id="view-pair" class="screen" hidden>
+      <img class="logo" src="/icon-192.png" alt="" width="96" height="96" />
+      <h1>Yoru no celular</h1>
+      <p class="muted">No computador, abra o Yoru › Celular e escaneie o QR Code, ou digite o código de 8 números.</p>
+      <form id="pair-form" autocomplete="off">
+        <input id="pair-code" inputmode="numeric" maxlength="12" placeholder="00000000" aria-label="Código de pareamento" />
+        <button class="btn primary" type="submit">Parear</button>
+      </form>
+      <p id="pair-msg" class="msg" role="status"></p>
+      <p id="install-hint" class="muted small" hidden></p>
+      <button id="install-btn" class="btn primary" type="button" hidden>＋ Instalar Yoru</button>
+    </section>
+
+    <section id="view-main" class="screen main" hidden>
+      <header class="top">
+        <div class="brand"><img src="/icon-192.png" alt="" width="28" height="28" /><strong>Yoru</strong><span id="dot" class="dot" title="Conexão"></span></div>
+        <div class="row top-actions">
+          <button id="btn-install" class="icon-btn" type="button" aria-label="Instalar Yoru" title="Instalar Yoru" hidden>⬇️</button>
+          <button id="btn-clear" class="icon-btn" aria-label="Limpar conversa" title="Limpar conversa">🧹</button>
+          <button id="btn-settings" class="icon-btn" aria-label="Configurações" title="Configurações">⚙️</button>
+        </div>
+      </header>
+      <div id="offline" class="banner" role="status" hidden>⚠️ Sem conexão com o PC. Tentando reconectar…</div>
+      <div id="app-update" class="banner update" role="status" hidden>Uma atualização do Yoru está pronta. <button id="btn-update" class="btn small" type="button">Atualizar</button></div>
+
+      <div id="carousel" class="carousel">
+      <div id="pane-chat" class="pane">
+        <div id="messages" class="messages" aria-live="polite"></div>
+        <form id="composer" class="composer">
+          <textarea id="input" rows="1" maxlength="4000" placeholder="Fale com a Yoru…" aria-label="Mensagem"></textarea>
+          <button id="btn-mic" class="btn mic" type="button" aria-label="Ditar mensagem por voz" title="Ditar por voz" hidden>🎤</button>
+          <button class="btn primary send" type="submit" aria-label="Enviar">➤</button>
+        </form>
+      </div>
+
+      <div id="pane-avatar" class="pane avatar-pane">
+        <div class="stage">
+          <canvas id="avatar-canvas" class="avatar-canvas" role="img" aria-label="Avatar 3D da Yoru" hidden></canvas>
+          <img id="avatar-img" class="avatar-img" src="/reactions/aguardando.webp" alt="Avatar da Yoru" width="320" height="320" />
+          <div id="avatar-loading" class="avatar-loading" role="status" hidden>Carregando avatar…</div>
+        </div>
+        <p id="avatar-status" class="avatar-status" role="status">Toque no microfone para falar com a Yoru</p>
+        <p id="avatar-reply" class="avatar-reply" aria-live="polite"></p>
+        <form id="avatar-form" class="avatar-form" autocomplete="off">
+          <input id="avatar-input" maxlength="1000" placeholder="Ou escreva para a Yoru…" aria-label="Escrever para a Yoru" />
+          <button class="btn primary send" type="submit" aria-label="Enviar">➤</button>
+        </form>
+        <button id="btn-talk" class="talk" type="button" aria-label="Falar com a Yoru" hidden>🎤</button>
+        <p id="avatar-nosupport" class="muted small" hidden>Voz indisponível neste navegador (precisa de HTTPS ou Tailscale + Chrome/Safari). Use o chat.</p>
+      </div>
+
+      <div id="pane-pc" class="pane">
+        <div id="pc-locked" class="card center">
+          <div class="big">🔒</div>
+          <h2>Controle do PC</h2>
+          <p id="pc-locked-note" class="muted">Digite a senha de controle definida no computador.</p>
+          <form id="unlock-form" autocomplete="off">
+            <input id="pc-pass" type="password" autocomplete="current-password" placeholder="Senha de controle" aria-label="Senha de controle" />
+            <button class="btn primary" type="submit">Liberar</button>
+          </form>
+          <p id="unlock-msg" class="msg" role="status"></p>
+        </div>
+
+        <div id="pc-unlocked" hidden>
+          <div class="card row between">
+            <span>🔓 Controle liberado · <b id="pc-timer">--:--</b></span>
+            <button id="btn-lock" class="btn small">Bloquear</button>
+          </div>
+          <div class="card">
+            <h3>Volume</h3>
+            <div class="row">
+              <button class="btn" data-act="volume" data-args='{"op":"mute"}' aria-label="Mudo">🔇</button>
+              <button class="btn" data-act="volume" data-args='{"op":"down","n":5}' aria-label="Diminuir">−</button>
+              <input id="vol" type="range" min="0" max="100" value="30" aria-label="Volume" />
+              <button class="btn" data-act="volume" data-args='{"op":"up","n":5}' aria-label="Aumentar">+</button>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Mídia e apresentação</h3>
+            <div class="grid5">
+              <button class="btn" data-act="media" data-args='{"op":"prev"}' aria-label="Anterior">⏮</button>
+              <button class="btn" data-act="media" data-args='{"op":"playpause"}' aria-label="Tocar ou pausar">⏯</button>
+              <button class="btn" data-act="media" data-args='{"op":"next"}' aria-label="Próxima">⏭</button>
+              <button class="btn" data-act="arrow" data-args='{"dir":"left"}' aria-label="Seta esquerda">◀</button>
+              <button class="btn" data-act="arrow" data-args='{"dir":"right"}' aria-label="Seta direita">▶</button>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Janelas</h3>
+            <div class="grid2">
+              <button class="btn" data-act="switch">Alternar janela</button>
+              <button class="btn" data-act="desktop">Área de trabalho</button>
+              <button class="btn" data-act="window" data-args='{"act":"minimize"}'>Minimizar</button>
+              <button class="btn" data-act="window" data-args='{"act":"maximize"}'>Maximizar</button>
+            </div>
+            <button id="btn-list" class="btn wide">Ver janelas abertas</button>
+            <ul id="win-list" class="list"></ul>
+          </div>
+          <div class="card">
+            <h3>Abrir programa</h3>
+            <form id="launch-form" class="row" autocomplete="off">
+              <input id="launch-name" maxlength="60" placeholder="Ex.: Spotify, Chrome, Calculadora" aria-label="Nome do programa" />
+              <button class="btn primary" type="submit">Abrir</button>
+            </form>
+            <div id="launch-favs" class="chips" aria-label="Programas usados recentemente"></div>
+          </div>
+          <div class="card">
+            <h3>Tela do PC</h3>
+            <div class="row">
+              <button id="btn-screen" class="btn">Ver tela</button>
+              <label class="check inline"><input id="live" type="checkbox" /> Ao vivo</label>
+            </div>
+            <img id="screen" class="screen-img" alt="Tela do computador. Toque para ampliar ou reduzir." hidden />
+          </div>
+          <div class="card">
+            <h3>Energia</h3>
+            <div class="grid2">
+              <button class="btn" data-act="lock" data-confirm="Bloquear o Windows agora?">🔒 Bloquear PC</button>
+              <button class="btn" data-act="sleep" data-danger="1" data-confirm="Suspender o PC agora?">🌙 Suspender</button>
+              <button class="btn" data-act="restart" data-danger="1" data-confirm="Reiniciar o PC? Ele reinicia em 30 segundos.">🔄 Reiniciar</button>
+              <button class="btn danger" data-act="shutdown" data-danger="1" data-confirm="Desligar o PC? Ele desliga em 30 segundos.">⏻ Desligar</button>
+            </div>
+            <button class="btn wide" data-act="cancelPower">Cancelar desligamento/reinício</button>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <nav class="tabbar" aria-label="Modos">
+        <button id="tab-chat" class="tab active" data-pane="chat"><span>💬</span>Yoru</button>
+        <button id="tab-avatar" class="tab" data-pane="avatar"><span>🎙️</span>Avatar</button>
+        <button id="tab-pc" class="tab" data-pane="pc"><span>🖥️</span>PC</button>
+        <button id="tab-settings" class="tab" type="button" aria-label="Abrir configurações"><span>⚙️</span>Config.</button>
+      </nav>
+      <div id="dots" class="dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+    </section>
+  </main>
+
+  <dialog id="settings" class="sheet" aria-labelledby="set-title">
+    <div class="sheet-head"><h2 id="set-title">Configurações</h2><button id="set-close" class="icon-btn" type="button" aria-label="Fechar">✕</button></div>
+
+    <h3>Voz</h3>
+    <label class="set-row"><span>Yoru responde falando</span><input id="cfg-speak" class="sw" type="checkbox" /></label>
+    <label class="set-row"><span>Conversa contínua<small>Depois que ela fala, o microfone abre sozinho (tela Avatar)</small></span><input id="cfg-auto" class="sw" type="checkbox" /></label>
+    <label class="set-row stack"><span>Voz</span><select id="cfg-voice"><option value="">Padrão (português)</option></select></label>
+    <label class="set-row stack"><span>Velocidade <b id="cfg-rate-v">1.0×</b></span><input id="cfg-rate" type="range" min="0.6" max="1.6" step="0.1" value="1" /></label>
+    <label class="set-row stack"><span>Tom <b id="cfg-pitch-v">1.0</b></span><input id="cfg-pitch" type="range" min="0.6" max="1.6" step="0.1" value="1" /></label>
+    <label class="set-row stack"><span>Idioma do microfone</span>
+      <select id="cfg-lang"><option value="pt-BR">Português (Brasil)</option><option value="en-US">English (US)</option><option value="es-ES">Español</option></select></label>
+    <button id="set-test" class="btn wide" type="button">🔊 Testar voz</button>
+
+    <h3>Avatar</h3>
+    <label class="set-row"><span>Avatar 3D<small>Desligado usa a imagem (gasta menos bateria)</small></span><input id="cfg-av3d" class="sw" type="checkbox" /></label>
+    <label class="set-row stack"><span>Qualidade do 3D</span>
+      <select id="cfg-quality"><option value="eco">Econômica (30 fps)</option><option value="normal">Normal</option><option value="alta">Alta (mais nítida)</option></select></label>
+    <label class="set-row"><span>Mostrar a resposta também no avatar do PC</span><input id="cfg-avatarPc" class="sw" type="checkbox" /></label>
+    <label class="set-row"><span>Manter a tela ligada no Avatar</span><input id="cfg-keepAwake" class="sw" type="checkbox" /></label>
+
+    <h3>Aparência</h3>
+    <label class="set-row stack"><span>Tema do aplicativo</span>
+      <select id="cfg-theme"><option value="dark">Escuro</option><option value="light">Claro</option><option value="system">Seguir o sistema</option></select></label>
+    <label class="set-row stack"><span>Tamanho do texto</span>
+      <select id="cfg-fs"><option value="p">Pequeno</option><option value="m">Médio</option><option value="g">Grande</option></select></label>
+    <label class="set-row"><span>Reduzir animações<small>Menos movimento e efeitos na interface</small></span><input id="cfg-reducedMotion" class="sw" type="checkbox" /></label>
+    <label class="set-row"><span>Vibração ao tocar</span><input id="cfg-haptic" class="sw" type="checkbox" /></label>
+    <label class="set-row"><span>Notificações de reconexão<small>Avisa quando a Yoru voltar a conectar ao PC</small></span><input id="cfg-notifications" class="sw" type="checkbox" /></label>
+    <label class="set-row stack"><span>Cor de destaque</span><select id="cfg-accent"><option value="orange">Laranja Yoru</option><option value="violet">Violeta</option><option value="blue">Azul</option><option value="rose">Rosa</option><option value="green">Verde</option></select></label>
+    <label class="set-row stack"><span>Fundo do aplicativo</span><select id="cfg-backdrop"><option value="plain">Clássico</option><option value="aurora">Aurora roxa</option><option value="midnight">Meia-noite azul</option><option value="sunset">Pôr do sol</option></select></label>
+
+    <h3>Dispositivo e sincronização</h3>
+    <div class="card device-stats" aria-live="polite">
+      <div class="row between"><span>Conexão com o PC</span><strong id="cfg-connection">Verificando…</strong></div>
+      <div class="row between"><span>Latência</span><strong id="cfg-latency">—</strong></div>
+      <div class="row between"><span>Última verificação</span><strong id="cfg-lastcheck">—</strong></div>
+      <div class="row between"><span>Bateria</span><strong id="cfg-battery">Indisponível</strong></div>
+      <div class="row between"><span>Rede</span><strong id="cfg-network">Verificando…</strong></div>
+      <div class="row between"><span>Modo do app</span><strong id="cfg-mode">Navegador</strong></div>
+      <button id="cfg-sync" class="btn wide" type="button">⟳ Sincronizar agora</button>
+      <p class="muted small" id="cfg-sync-note">Verifica o PC e atualiza os indicadores. A conversa não é enviada nesta verificação.</p>
+      <p class="muted small">Para conectar: mantenha o Yoru aberto no computador, use a mesma rede quando possível e confira se o firewall permite a conexão.</p>
+    </div>
+
+    <h3>Conta</h3>
+    <div class="grid2">
+      <button id="set-clear" class="btn" type="button">🧹 Limpar conversa</button>
+      <button id="set-reset" class="btn" type="button">↺ Restaurar padrões</button>
+    </div>
+    <button id="set-logout" class="btn danger wide" type="button">Desconectar este celular</button>
+    <p id="set-3dinfo" class="muted small set-note" hidden></p>
+    <p class="muted small set-note">As configurações ficam guardadas só neste celular.</p>
+  </dialog>
+
+  <dialog id="dlg">
+    <p id="dlg-text"></p>
+    <div class="row end"><button id="dlg-no" class="btn" value="no">Cancelar</button><button id="dlg-yes" class="btn primary" value="yes">Confirmar</button></div>
+  </dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
