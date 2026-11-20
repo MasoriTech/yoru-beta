@@ -11,10 +11,15 @@ jobs:
     env:
       ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
     steps:
+      - run: git config --global core.autocrlf false
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - run: npm test -- --test-reporter=spec
+      - run: npm test
+      - name: Mostrar testes que falharam
+        if: failure()
+        shell: bash
+        run: node --test test/*.test.js 2>&1 | grep -E "^not ok"
